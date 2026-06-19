@@ -1,0 +1,21 @@
+[project]
+name = "financier-ai-finance-assistant"
+version = "0.1.0"
+description = "Multi-agent, RAG-backed conversational finance educator (LangGraph + Claude + Streamlit)."
+requires-python = ">=3.10"
+
+[tool.black]
+line-length = 79
+target-version = ["py312"]
+
+[tool.ruff]
+line-length = 79
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = ["E203"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

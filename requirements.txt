@@ -1,0 +1,21 @@
+# Financier — AI Finance Assistant — core dependencies
+# These are pure-Python / lightweight and are required to run the app.
+
+anthropic>=0.49.0          # Claude LLM client (Anthropic API + Bedrock helper)
+boto3>=1.34.0              # AWS Bedrock (Claude) + optional DynamoDB store
+langgraph>=0.2.0           # multi-agent workflow orchestration (StateGraph)
+langchain-core>=0.3.0      # shared message/runnable primitives used by LangGraph
+
+streamlit>=1.39.0          # multi-tab web UI
+plotly>=5.20.0             # portfolio / market / goal charts
+
+yfinance>=0.2.40           # primary real-time market data source (no API key)
+pandas>=2.0.0
+numpy>=1.26.0
+
+pydantic>=2.6.0            # structured agent outputs
+pyyaml>=6.0                # config.yaml loader
+python-dotenv>=1.0.0       # .env loading
+requests>=2.31.0           # Alpha Vantage fallback + generic HTTP
+tenacity>=8.2.0            # retry/backoff for flaky APIs
+scikit-learn>=1.4.0        # TF-IDF retriever — RAG fallback when FAISS isn't installed

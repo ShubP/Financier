@@ -1,0 +1,10 @@
+# Financier — optional / heavier dependencies.
+# The app runs WITHOUT these (it degrades gracefully):
+#   - No faiss/sentence-transformers -> RAG falls back to a TF-IDF retriever.
+#   - No google-generativeai -> Gemini provider is unavailable.
+# (boto3 for AWS Bedrock/DynamoDB is in the core requirements.txt.)
+# Install with:  pip install -r requirements-extras.txt
+
+faiss-cpu>=1.8.0               # vector index for semantic RAG
+sentence-transformers>=2.6.0   # local embedding model (no API key, pulls torch)
+google-generativeai>=0.5.0     # optional Google Gemini provider

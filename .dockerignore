@@ -1,0 +1,12 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+.cache/
+.git/
+.gitignore
+.env
+data/user_profiles.json
+.pytest_cache/
+*.md
+docs/

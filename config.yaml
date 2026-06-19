@@ -1,0 +1,54 @@
+# Financier — AI Finance Assistant — runtime configuration.
+# Everything here is overridable; secrets come from environment variables (.env).
+
+app:
+  name: "Financier — AI Finance Assistant"
+  tagline: "Democratizing financial literacy through agentic AI"
+  # Shown in the UI and appended to every substantive response.
+  disclaimer: >-
+    Financier provides general financial education only. It is not financial,
+    investment, tax, or legal advice. Always consult a licensed professional
+    before making financial decisions.
+
+llm:
+  # Primary backend. "bedrock" runs Claude through your AWS account.
+  # Order used for "auto": anthropic -> bedrock -> gemini -> mock.
+  provider: "bedrock"         # bedrock | anthropic | gemini | mock | auto
+  fallback_to_mock: true      # run the offline mock if no credentials resolve
+  max_tokens: 3000            # headroom for adaptive-thinking tokens + answer
+  adaptive_thinking: true     # Claude adaptive thinking on the reasoning model
+  # Model ids for the NON-Bedrock providers (Anthropic API / Gemini).
+  models:
+    router: "claude-haiku-4-5"
+    default: "claude-opus-4-8"
+  bedrock:
+    region: "us-east-1"       # region where you enabled Claude model access
+    # Full Amazon Bedrock model / inference-profile ids (global endpoints).
+    # See the README "Run on AWS Bedrock" section for how to pick these.
+    models:
+      router: "global.anthropic.claude-haiku-4-5-20251001-v1:0"
+      default: "global.anthropic.claude-sonnet-4-6"
+
+market_data:
+  primary: "yfinance"         # yfinance | mock
+  cache_ttl_minutes: 30       # cache quotes to respect rate limits
+  alpha_vantage_fallback: true   # use Alpha Vantage if yfinance fails and a key is set
+
+rag:
+  knowledge_dir: "src/data/knowledge"
+  chunk_size: 800
+  chunk_overlap: 120
+  top_k: 4
+  # auto -> sentence-transformers + FAISS if installed, else TF-IDF retriever.
+  embeddings: "auto"          # auto | sentence-transformers | tfidf
+  index_dir: ".cache/faiss"
+
+memory:
+  backend: "json"             # json | dynamodb
+  profiles_path: "data/user_profiles.json"
+  dynamodb:
+    table: "financier-profiles"
+    region: "us-east-1"
+
+logging:
+  level: "INFO"

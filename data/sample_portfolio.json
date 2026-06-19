@@ -1,0 +1,14 @@
+{
+  "holdings": [
+    {"symbol": "VTI", "shares": 30, "asset_class": "equity", "cost_basis": 6000},
+    {"symbol": "VXUS", "shares": 25, "asset_class": "equity", "cost_basis": 1400},
+    {"symbol": "BND", "shares": 40, "asset_class": "bond", "cost_basis": 2900},
+    {"symbol": "VNQ", "shares": 10, "asset_class": "reit", "cost_basis": 850}
+  ],
+  "goal": {
+    "target_amount": 250000,
+    "current_savings": 15000,
+    "monthly_contribution": 600,
+    "risk_profile": "moderate"
+  }
+}
