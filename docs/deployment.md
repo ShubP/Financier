@@ -26,20 +26,21 @@ docker run -p 8501:8501 --env-file .env financier
 Open http://localhost:8501. The image installs only `requirements.txt`; to
 enable semantic RAG, add `requirements-extras.txt` to the build.
 
-## AWS — Claude via Bedrock
+## AWS — models via Bedrock
 
 1. `pip install -r requirements.txt` (includes `boto3`).
-2. Request access to the Claude models in the Amazon Bedrock console.
+2. Request access to the Amazon Nova models in the Amazon Bedrock console.
 3. Provide AWS credentials (env vars, `aws configure`, or an instance role).
 4. In `config.yaml`:
    ```yaml
    llm:
      provider: bedrock
      bedrock:
+       engine: converse
        region: us-east-1
    ```
-   Set full Bedrock model ids under `llm.bedrock.models`, e.g.
-   `global.anthropic.claude-sonnet-4-6` (see the README).
+   Defaults to Amazon Nova (`engine: converse`); set ids under
+   `llm.bedrock.models`. See the README for details.
 
 ## AWS — DynamoDB profile store
 

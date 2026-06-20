@@ -5,13 +5,13 @@
 Financier is a **multi-agent, retrieval-augmented conversational finance
 educator**. A router classifies each message and hands it to a specialist
 agent — Q&A, Portfolio, Market, or Goal — orchestrated with **LangGraph** and
-powered by **Claude on Amazon Bedrock** (with direct-Anthropic, Gemini, and an
+powered by **Amazon Bedrock** (Amazon Nova by default; Claude, Gemini, and an
 offline-mock fallback). It ships with a **Streamlit** multi-tab UI, a curated
 finance knowledge base (RAG), live market data, and deterministic
 portfolio/goal math.
 
 It is built to **run out of the box with no credentials** (an offline demo
-mode) and to scale up to real Claude models on your own AWS account.
+mode) and to scale up to real models on your own AWS account.
 
 ---
 
@@ -70,7 +70,7 @@ threaded through every node.
 | Concern | Choice | Notes / alternatives |
 |--------|--------|----------------------|
 | Orchestration | **LangGraph** | Typed `StateGraph` with conditional routing. |
-| LLM | **Claude on AWS Bedrock** | A provider abstraction also supports the direct Anthropic API, Gemini, and an offline mock. |
+| LLM | **Amazon Bedrock (Amazon Nova)** | A provider abstraction also supports Claude (Bedrock or direct), Gemini, and an offline mock. |
 | RAG | **FAISS + sentence-transformers**, TF-IDF fallback | Auto-detects: semantic if the extras are installed, else lexical. |
 | Market data | **yfinance** (+ Alpha Vantage) | No key needed for yfinance; deterministic mock keeps it offline-safe. |
 | Structured output | **Pydantic** | Provider-agnostic JSON coercion + validation. |
@@ -127,7 +127,7 @@ streamlit run src/web_app/streamlit_app.py
 
 With **no credentials**, Financier runs in **demo mode** (a built-in mock LLM +
 mock market data) so the whole pipeline works for a walkthrough. Add AWS
-credentials (below) for real Claude answers.
+credentials (below) for real model answers.
 
 One-off CLI (no Streamlit):
 
@@ -139,8 +139,9 @@ python run.py "What is dollar-cost averaging?"
 
 ## ☁️ Run on AWS Bedrock (primary backend)
 
-Financier is configured to run Claude through **Amazon Bedrock** on your own AWS
-account (`llm.provider: bedrock` in `config.yaml`).
+Financier is configured to run on **Amazon Bedrock** using **Amazon Nova**
+models by default (`llm.provider: bedrock` in `config.yaml`). Nova models are
+Amazon's own and are enabled instantly with no third-party approval.
 
 **1. Install the AWS CLI** (v2.13.23+) and configure credentials:
 
@@ -153,9 +154,10 @@ Credentials from `aws configure` (in `~/.aws/credentials`) are picked up
 automatically — you don't need to put keys in `.env`.
 
 **2. Enable Claude model access** in the AWS Console →
-**Bedrock → Model access** → request access to the Anthropic Claude models in
+**Bedrock → Model access** → request access to the **Amazon Nova** models (Nova Micro and Nova Lite) in
 your region. Availability varies by region (`us-east-1` and `us-west-2` are
-common). See `aws bedrock list-foundation-models --by-provider anthropic
+common). Anthropic Claude models now require separate approval, so Nova is
+the simplest path. See `aws bedrock list-foundation-models --by-provider amazon
 --query "modelSummaries[*].modelId"`.
 
 **3. (Optional) Pick models / region** in `config.yaml`:
@@ -164,27 +166,29 @@ common). See `aws bedrock list-foundation-models --by-provider anthropic
 llm:
   provider: bedrock
   bedrock:
+    engine: converse
     region: us-east-1
     models:
-      router:  "global.anthropic.claude-haiku-4-5-20251001-v1:0"
-      default: "global.anthropic.claude-sonnet-4-6"
+      router:  "us.amazon.nova-micro-v1:0"
+      default: "us.amazon.nova-lite-v1:0"
 ```
 
-The defaults use **global** inference-profile IDs (cross-region routing, no
-pricing premium). The router uses **Haiku 4.5** (cheap classification) and the
-specialists use **Sonnet 4.6** (good quality/cost balance). Swap the default to
-`global.anthropic.claude-opus-4-6-v1` for top quality, or a `us.`-prefixed ID
-for region-pinned routing.
+The defaults use **Amazon Nova**: the router uses **Nova Micro** and the
+agents use **Nova Lite** -- both inexpensive and enabled instantly. If a `us.`
+inference-profile id is rejected in your region, try the bare id (e.g.
+`amazon.nova-lite-v1:0`). To use Claude instead, set `bedrock.engine: anthropic`
+with Claude model ids (requires separate Anthropic approval).
 
 **4. IAM** — the principal needs `bedrock:InvokeModel` (and
-`bedrock:InvokeModelWithResponseStream`) on the Claude model resources, plus
+`bedrock:InvokeModelWithResponseStream`) on the chosen model's resources, plus
 `bedrock:ListFoundationModels`. The AWS managed policy `AmazonBedrockFullAccess`
 covers this for getting started.
 
 **5. Run it.** The sidebar will show `LLM provider: bedrock`.
 
-> **Cost:** global Sonnet 4.6 is ~$3 / $15 per 1M input/output tokens and Haiku
-> 4.5 ~$1 / $5; an educational chat session costs cents. Enable
+> **Cost:** Amazon Nova is very cheap -- Nova Micro about $0.035 / $0.14 and
+> Nova Lite about $0.06 / $0.24 per 1M input/output tokens, so a chat session
+> costs a fraction of a cent. Enable
 > [Bedrock invocation logging](https://docs.aws.amazon.com/bedrock/latest/userguide/model-invocation-logging.html)
 > if you want an audit trail.
 

@@ -22,12 +22,15 @@ llm:
     router: "claude-haiku-4-5"
     default: "claude-opus-4-8"
   bedrock:
-    region: "us-east-1"       # region where you enabled Claude model access
-    # Full Amazon Bedrock model / inference-profile ids (global endpoints).
-    # See the README "Run on AWS Bedrock" section for how to pick these.
+    # converse = boto3 Converse API (any model, e.g. Amazon Nova).
+    # anthropic = Claude via AnthropicBedrock (needs Anthropic approval).
+    engine: "converse"        # converse | anthropic
+    region: "us-east-1"       # region where you enabled model access
+    # Full Bedrock model / inference-profile ids. Amazon Nova is cheap and
+    # enabled instantly (no third-party approval). See the README.
     models:
-      router: "global.anthropic.claude-haiku-4-5-20251001-v1:0"
-      default: "global.anthropic.claude-sonnet-4-6"
+      router: "us.amazon.nova-micro-v1:0"
+      default: "us.amazon.nova-lite-v1:0"
 
 market_data:
   primary: "yfinance"         # yfinance | mock

@@ -62,21 +62,28 @@ def build_provider(cfg: Config | None = None) -> LLMProvider:
     def make_bedrock() -> LLMProvider | None:
         if not _aws_creds_available():
             return None
+        bkwargs = dict(kwargs)
+        router = cfg.get("llm.bedrock.models.router")
+        default = cfg.get("llm.bedrock.models.default")
+        if router:
+            bkwargs["router_model"] = router
+        if default:
+            bkwargs["default_model"] = default
+        region = cfg.get("llm.bedrock.region", "us-east-1")
+        engine = str(cfg.get("llm.bedrock.engine", "converse")).lower()
         try:
-            from .bedrock_provider import build_bedrock_provider
+            if engine == "anthropic":
+                from .bedrock_provider import build_bedrock_provider
 
-            bkwargs = dict(kwargs)
-            router = cfg.get("llm.bedrock.models.router")
-            default = cfg.get("llm.bedrock.models.default")
-            if router:
-                bkwargs["router_model"] = router
-            if default:
-                bkwargs["default_model"] = default
-            return build_bedrock_provider(
-                region=cfg.get("llm.bedrock.region", "us-east-1"),
-                **bkwargs,
+                return build_bedrock_provider(region=region, **bkwargs)
+            from .bedrock_converse_provider import (
+                build_bedrock_converse_provider,
             )
-        except Exception as exc:  # missing boto3 / bedrock extra
+
+            return build_bedrock_converse_provider(
+                region=region, **bkwargs
+            )
+        except Exception as exc:  # missing boto3 / bad config
             logger.warning("Bedrock unavailable: %s", exc)
             return None
 
