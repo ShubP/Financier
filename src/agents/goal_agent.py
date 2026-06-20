@@ -51,6 +51,20 @@ def parse_goal(query: str, profile: dict[str, Any]) -> dict[str, Any]:
     )
     if t:
         base["target_amount"] = _amount(t.group(1), t.group(2))
+
+    # Fallback: the largest standalone amount is likely the target.
+    if not base.get("target_amount"):
+        amounts = [
+            _amount(m.group(1), m.group(2))
+            for m in re.finditer(_MONEY, text)
+        ]
+        used = {
+            base.get("monthly_contribution"),
+            base.get("current_savings"),
+        }
+        candidates = [a for a in amounts if a and a not in used]
+        if candidates:
+            base["target_amount"] = max(candidates)
     return base
 
 
