@@ -11,7 +11,7 @@ app:
     before making financial decisions.
 
 llm:
-  # Primary backend. "bedrock" runs Claude through your AWS account.
+  # Primary backend. "bedrock" runs Amazon Nova (or Claude) on AWS.
   # Order used for "auto": anthropic -> bedrock -> gemini -> mock.
   provider: "bedrock"         # bedrock | anthropic | gemini | mock | auto
   fallback_to_mock: true      # run the offline mock if no credentials resolve
